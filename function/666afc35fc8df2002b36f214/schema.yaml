@@ -44,6 +44,13 @@ triggers:
       preflight: true
     type: http
     active: true
+  updateUserPassword:
+    options:
+      method: Post
+      path: /update-user-password
+      preflight: true
+    type: http
+    active: true
 env:
   IDENTITY_FULL_ACCESS_KEY: "{IDENTITY_FULL_ACCESS_KEY}"
   USERS_BUCKET: "{USERS_BUCKET}"
@@ -53,3 +60,4 @@ env:
   YANDEX_CLIENT_SECRET_KEY: "{YANDEX_CLIENT_SECRET_KEY}"
   FORGOT_PASSWORD_REQUESTS_BUCKET: "{FORGOT_PASSWORD_REQUESTS_BUCKET}"
 memoryLimit: 100
+order: 0
