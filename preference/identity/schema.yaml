@@ -1,0 +1,10 @@
+attributes:
+  type: object
+  properties:
+    user:
+      type: relation
+      title: user
+      description: Description of 'user'
+      options: {}
+      relationType: onetoone
+      bucketId: 666afd75fc8df2002b36f245

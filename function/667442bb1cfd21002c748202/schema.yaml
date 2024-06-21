@@ -1,0 +1,22 @@
+_id: 667442bb1cfd21002c748202
+name: Mailer
+language: javascript
+timeout: 12
+triggers:
+  onPasswordResetRequestInsert:
+    type: bucket
+    active: true
+    options:
+      bucket: 66743a6d1cfd21002c747d86
+      type: INSERT
+  sendMail:
+    options:
+      method: Post
+      path: /send-email
+      preflight: true
+    type: http
+    active: true
+env:
+  SMTP_HOST: "{SMTP_HOST}"
+  SMTP_PORT: "{SMTP_PORT}"
+memoryLimit: 100

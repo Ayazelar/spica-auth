@@ -1,0 +1,63 @@
+_id: 666afd75fc8df2002b36f245
+title: Users
+description: Describe your new bucket
+icon: view_stream
+primary: name
+readOnly: false
+history: false
+properties:
+  name:
+    type: string
+    title: name
+    description: Description of the name input
+    options:
+      position: bottom
+  surname:
+    type: string
+    title: surname
+    description: Description of the surname input
+    options:
+      position: bottom
+  email:
+    type: string
+    title: email
+    description: Description of the email input
+    options:
+      position: bottom
+  phone_number:
+    type: string
+    title: phone_number
+    description: Description of the phone_number input
+    options:
+      position: bottom
+  identity_number:
+    type: string
+    title: identity_number
+    description: Description of the identity_number input
+    options:
+      position: bottom
+  birthday:
+    type: date
+    title: birthday
+    description: Description of the birthday input
+    options:
+      position: bottom
+  test:
+    type: string
+    title: test
+    description: Description of the test input
+    options:
+      position: bottom
+  kk:
+    type: string
+    title: kk
+    description: Description of the kk input
+    options:
+      position: bottom
+      translate: true
+acl:
+  write: true==true
+  read: true==true
+order: 0
+required:
+  - email

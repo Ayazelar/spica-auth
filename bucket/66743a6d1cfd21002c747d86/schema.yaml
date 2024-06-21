@@ -1,0 +1,43 @@
+_id: 66743a6d1cfd21002c747d86
+title: Forgot Password Requests
+description: Describe your new bucket
+icon: view_stream
+primary: email
+readOnly: false
+history: false
+properties:
+  email:
+    type: string
+    title: email
+    description: Description of the email input
+    options:
+      position: bottom
+  uuid:
+    type: string
+    title: uuid
+    description: Description of the uuid input
+    options:
+      position: bottom
+  expire_at:
+    type: date
+    title: expire_at
+    description: Description of the expire_at input
+    options:
+      position: bottom
+  created_at:
+    type: date
+    title: created_at
+    description: Description of the created_at input
+    options:
+      position: bottom
+    default: :created_at
+  updated_at:
+    type: date
+    title: updated_at
+    description: Description of the updated_at input
+    options:
+      position: bottom
+acl:
+  write: true==true
+  read: true==true
+order: 1
