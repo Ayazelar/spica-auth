@@ -20,3 +20,4 @@ env:
   SMTP_HOST: "{SMTP_HOST}"
   SMTP_PORT: "{SMTP_PORT}"
 memoryLimit: 100
+order: 1

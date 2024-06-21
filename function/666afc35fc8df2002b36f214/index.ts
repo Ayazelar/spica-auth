@@ -25,7 +25,11 @@ const MESSAGES = {
 	LOGIN_SUCCESSFULL: "Successfully logged",
 	SHORT_PASSWORD: "The password must be min 6 char",
 	IDENTITY_NOT_EXIST: "Identity not exist",
-	FORGOT_PASSWORD_MAIL_SENT: "Forgot password mail sent"
+	FORGOT_PASSWORD_MAIL_SENT: "Forgot password mail sent",
+	UUID_NOT_EXIST:"Uuid not exist",
+	USER_PASSWORD_CHANGED_SUCCESSFULL:"Your password has been changed successfully",
+	
+	EXPIRED:'Request has been expired'
 };
 
 
@@ -266,4 +270,46 @@ export async function sendPasswordResetMail(req, res) {
 	} catch (error) {
 		return errorResponse(res, error.message);
 	}
+}
+
+export async function updateUserPassword(req,res){
+
+	const {password,uuid} = req.body;
+
+	const forgotPasswordReq =await Bucket.data.getAll(FORGOT_PASSWORD_REQUESTS_BUCKET,{
+			        queryParams: {
+            filter: { uuid: uuid }
+        }
+	}).then((r)=>r[0]);
+
+	if(!forgotPasswordReq){
+		return errorResponse(res,MESSAGES.UUID_NOT_EXIST);
+	}
+
+	const isExpired = new Date() > new Date(forgotPasswordReq.expire_at);
+
+	if(isExpired){
+		return res.status(400).send({message: MESSAGES.EXPIRED});
+	}
+
+	const {_id, ...identityWithoutId} = await Identity.getAll({
+		filter : {
+				identifier : forgotPasswordReq.email
+		}
+	}).then((r)=>r[0]);
+
+	const updatedIdentity = {
+	    ...identityWithoutId,
+	    password
+	};
+
+	const userUpdated = await Identity.update(_id, updatedIdentity).catch(e => {
+	console.error("user password could not be updated" ,e);
+	res.status(400).send(e)
+    });
+
+	if (!userUpdated) return;
+
+    return res.status(200).send({ message: MESSAGES.USER_PASSWORD_CHANGED_SUCCESSFULL});
+
 }
