@@ -26,10 +26,10 @@ const MESSAGES = {
 	SHORT_PASSWORD: "The password must be min 6 char",
 	IDENTITY_NOT_EXIST: "Identity not exist",
 	FORGOT_PASSWORD_MAIL_SENT: "Forgot password mail sent",
-	UUID_NOT_EXIST:"Uuid not exist",
-	USER_PASSWORD_CHANGED_SUCCESSFULL:"Your password has been changed successfully",
-	
-	EXPIRED:'Request has been expired'
+	UUID_NOT_EXIST: "Uuid not exist",
+	PASSWORD_CHANGED_SUCCESSFULL: "Your password has been changed successfully",
+
+	EXPIRED: 'Request has been expired'
 };
 
 
@@ -239,7 +239,7 @@ async function completeYandexAuthorization(accessToken) {
 
 export async function sendPasswordResetMail(req, res) {
 
-	const {email} = req.body;
+	const { email } = req.body;
 	const isEmail = isValidEmail(email);
 
 	if (!isEmail) {
@@ -272,44 +272,52 @@ export async function sendPasswordResetMail(req, res) {
 	}
 }
 
-export async function updateUserPassword(req,res){
+export async function updateUserPassword(req, res) {
 
-	const {password,uuid} = req.body;
+	const { password, uuid } = req.body;
 
-	const forgotPasswordReq =await Bucket.data.getAll(FORGOT_PASSWORD_REQUESTS_BUCKET,{
-			        queryParams: {
-            filter: { uuid: uuid }
-        }
-	}).then((r)=>r[0]);
+	const [forgotPasswordReq] = await Bucket.data.getAll(FORGOT_PASSWORD_REQUESTS_BUCKET, {
+		queryParams: {
+			filter: { uuid }
+		}
+	});
 
-	if(!forgotPasswordReq){
-		return errorResponse(res,MESSAGES.UUID_NOT_EXIST);
+	if (!forgotPasswordReq) {
+		return errorResponse(res, MESSAGES.UUID_NOT_EXIST);
 	}
 
 	const isExpired = new Date() > new Date(forgotPasswordReq.expire_at);
 
-	if(isExpired){
-		return res.status(400).send({message: MESSAGES.EXPIRED});
+	if (isExpired) {
+		return res.status(400).send({ message: MESSAGES.EXPIRED });
 	}
 
-	const {_id, ...identityWithoutId} = await Identity.getAll({
-		filter : {
-				identifier : forgotPasswordReq.email
+	const [{ _id, ...identityWithoutId }] = await Identity.getAll({
+		filter: {
+			identifier: forgotPasswordReq.email
 		}
-	}).then((r)=>r[0]);
+	});
 
 	const updatedIdentity = {
-	    ...identityWithoutId,
-	    password
+		...identityWithoutId,
+		password
 	};
 
-	const userUpdated = await Identity.update(_id, updatedIdentity).catch(e => {
-	console.error("user password could not be updated" ,e);
-	res.status(400).send(e)
-    });
+	try {
+		await Identity.update(_id, updatedIdentity)
 
-	if (!userUpdated) return;
+		let patchedFields = {
+			expire_at: new Date(),
+			updated_at: new Date()
+		}
 
-    return res.status(200).send({ message: MESSAGES.USER_PASSWORD_CHANGED_SUCCESSFULL});
+		await Bucket.data.patch(FORGOT_PASSWORD_REQUESTS_BUCKET, forgotPasswordReq._id, patchedFields);
 
-}
+		return res.status(200).send({ message: MESSAGES.PASSWORD_CHANGED_SUCCESSFULL });
+	}
+	catch (error) {
+		console.error("user password could not be updated", error);
+		return errorResponse(res, error.message)
+	};
+
+};
